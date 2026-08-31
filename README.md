@@ -76,3 +76,10 @@ Run the automated test suite:
 ```bash
 npm test
 ```
+
+---
+
+## 📄 License & Disclaimer
+
+This project is open-source under the [MIT License](LICENSE).  
+*Designed for educational, diagnostic, and personal network optimization purposes.*
