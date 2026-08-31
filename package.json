@@ -1,0 +1,32 @@
+{
+  "name": "nexus-vpn-manager",
+  "version": "1.0.0",
+  "description": "All-in-One Multi-Protocol VPN & DPI Bypass Management Suite",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js",
+    "test": "node test/test-engine.js"
+  },
+  "keywords": [
+    "vpn",
+    "wireguard",
+    "vless",
+    "xray",
+    "shadowsocks",
+    "openvpn",
+    "dpi-bypass",
+    "proxy-manager"
+  ],
+  "author": "NexusVPN Team",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "qrcode": "^1.5.4",
+    "ssh2": "^1.16.0",
+    "ws": "^8.18.0"
+  }
+}

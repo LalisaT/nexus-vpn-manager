@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusVPN - All-in-One Multi-Protocol VPN & Bypass Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="theme-dark">
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="brand-text">
+          <h2>Nexus<span>VPN</span></h2>
+          <p class="tagline">All-in-One Bypass Suite</p>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="dashboard">
+          <i class="fa-solid fa-house-chimney-window"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-tab="servers">
+          <i class="fa-solid fa-server"></i>
+          <span>Servers & Nodes</span>
+          <span class="badge" id="servers-count-badge">5</span>
+        </button>
+        <button class="nav-item" data-tab="provisioner">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>1-Click Installer</span>
+          <span class="badge-hot">AUTO</span>
+        </button>
+        <button class="nav-item" data-tab="diagnostics">
+          <i class="fa-solid fa-radar"></i>
+          <span>Diagnostics & Leaks</span>
+        </button>
+        <button class="nav-item" data-tab="routing">
+          <i class="fa-solid fa-route"></i>
+          <span>Smart Bypass Rules</span>
+        </button>
+        <button class="nav-item" data-tab="settings">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer Status -->
+      <div class="sidebar-footer">
+        <div class="killswitch-widget">
+          <div class="widget-info">
+            <span class="label"><i class="fa-solid fa-shield-virus"></i> Kill Switch</span>
+            <span class="status-indicator active" id="killswitch-sidebar-status">ACTIVE</span>
+          </div>
+          <div class="widget-sub">Prevents IPv4/DNS leaks</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-viewport">
+      
+      <!-- Top App Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="page-title">Dashboard</h1>
+          <p id="page-subtitle">Real-time connection control & multi-protocol status</p>
+        </div>
+
+        <div class="header-right">
+          <!-- Connection Status Pill -->
+          <div class="status-pill disconnected" id="global-status-pill">
+            <span class="status-dot"></span>
+            <span id="global-status-text">UNPROTECTED</span>
+          </div>
+
+          <!-- Public IP Badge -->
+          <div class="ip-badge" id="header-ip-badge" title="Click to refresh IP details">
+            <i class="fa-solid fa-globe"></i>
+            <span class="ip-label">IP:</span>
+            <span class="ip-value" id="current-public-ip">Checking...</span>
+          </div>
+
+          <!-- Quick Import Action -->
+          <button class="btn btn-primary btn-sm" id="btn-quick-import-open">
+            <i class="fa-solid fa-file-import"></i>
+            <span>Import Profile</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section class="tab-view active" id="view-dashboard">
+        <div class="dashboard-grid">
+          
+          <!-- Connection Hero Card -->
+          <div class="card connection-hero-card">
+            <div class="shield-container">
+              <button class="connect-shield-btn" id="btn-toggle-connection" aria-label="Toggle VPN Connection">
+                <div class="shield-glow"></div>
+                <div class="shield-rings"></div>
+                <div class="shield-inner">
+                  <i class="fa-solid fa-power-off" id="shield-icon"></i>
+                  <span class="shield-action" id="shield-action-text">CONNECT</span>
+                </div>
+              </button>
+            </div>
+
+            <div class="connection-status-meta">
+              <h3 id="dash-connection-heading">Ready to Secure Connection</h3>
+              <p id="dash-connection-desc">Select a server node and tap Connect to encrypt all traffic.</p>
+              
+              <div class="timer-badge" id="session-timer" style="display: none;">
+                <i class="fa-regular fa-clock"></i>
+                <span id="timer-val">00:00:00</span>
+              </div>
+            </div>
+
+            <!-- Active Server Quick Card -->
+            <div class="active-node-banner" id="active-node-banner">
+              <div class="node-flag" id="dash-node-flag">🇩🇪</div>
+              <div class="node-details">
+                <span class="node-label">Selected Profile</span>
+                <h4 id="dash-node-name">Frankfurt Ultra-Fast (WireGuard)</h4>
+                <div class="node-tags">
+                  <span class="tag-protocol" id="dash-node-proto">WireGuard</span>
+                  <span class="tag-ping" id="dash-node-ping"><i class="fa-solid fa-bolt"></i> 28 ms</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="btn-switch-server-quick">
+                <i class="fa-solid fa-repeat"></i> Switch
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-Time Metrics & Telemetry -->
+          <div class="card telemetry-card">
+            <div class="card-header">
+              <div class="title-wrap">
+                <i class="fa-solid fa-chart-line"></i>
+                <h3>Real-Time Telemetry</h3>
+              </div>
+              <span class="live-pulse">LIVE</span>
+            </div>
+
+            <div class="metrics-row">
+              <div class="metric-item">
+                <div class="metric-icon rx"><i class="fa-solid fa-arrow-down"></i></div>
+                <div class="metric-data">
+                  <span class="metric-label">Download Speed</span>
+                  <div class="metric-val" id="metric-download-speed">0.0 <small>KB/s</small></div>
+                </div>
+              </div>
+
+              <div class="metric-item">
+                <div class="metric-icon tx"><i class="fa-solid fa-arrow-up"></i></div>
+                <div class="metric-data">
+                  <span class="metric-label">Upload Speed</span>
+                  <div class="metric-val" id="metric-upload-speed">0.0 <small>KB/s</small></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="metrics-row secondary">
+              <div class="mini-stat">
+                <span class="label">Downloaded</span>
+                <span class="value" id="metric-total-in">0.00 MB</span>
+              </div>
+              <div class="mini-stat">
+                <span class="label">Uploaded</span>
+                <span class="value" id="metric-total-out">0.00 MB</span>
+              </div>
+              <div class="mini-stat">
+                <span class="label">Virtual IP</span>
+                <span class="value code" id="metric-virtual-ip">---.---.---.---</span>
+              </div>
+            </div>
+
+            <!-- Visual Protocol Badges -->
+            <div class="protocol-matrix">
+              <span class="proto-badge active" title="Noise Protocol Cryptography">WireGuard</span>
+              <span class="proto-badge active" title="DPI Bypass TLS Reality">VLESS-Reality</span>
+              <span class="proto-badge active" title="AEAD Encryption">Shadowsocks-2022</span>
+              <span class="proto-badge active" title="TCP 443 Fallback">OpenVPN</span>
+              <span class="proto-badge active" title="Dynamic Port Forward">SSH SOCKS5</span>
+            </div>
+          </div>
+
+          <!-- Quick Security Checklist -->
+          <div class="card security-features-card">
+            <div class="card-header">
+              <div class="title-wrap">
+                <i class="fa-solid fa-user-shield"></i>
+                <h3>Bypass & Security Features</h3>
+              </div>
+            </div>
+
+            <div class="feature-checklist">
+              <div class="feature-row">
+                <div class="feat-icon"><i class="fa-solid fa-check-double text-emerald"></i></div>
+                <div class="feat-text">
+                  <strong>Deep Packet Inspection (DPI) Camouflage</strong>
+                  <span>XTLS-Reality wraps payload in realistic browser TLS handshakes.</span>
+                </div>
+              </div>
+              <div class="feature-row">
+                <div class="feat-icon"><i class="fa-solid fa-check-double text-emerald"></i></div>
+                <div class="feat-text">
+                  <strong>Encrypted DNS-over-HTTPS (DoH)</strong>
+                  <span>Queries routed through Cloudflare & Quad9 without ISP snooping.</span>
+                </div>
+              </div>
+              <div class="feature-row">
+                <div class="feat-icon"><i class="fa-solid fa-check-double text-emerald"></i></div>
+                <div class="feat-text">
+                  <strong>Zero-Leak Kill Switch</strong>
+                  <span>Blocks all unencrypted outbound packets if tunnel drops.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 2: SERVERS & NODES -->
+      <section class="tab-view" id="view-servers">
+        <div class="view-toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="server-search-input" placeholder="Search servers by country, protocol, city, or IP...">
+          </div>
+
+          <div class="filter-group">
+            <select id="filter-protocol-select">
+              <option value="all">All Protocols</option>
+              <option value="wireguard">WireGuard / AmneziaWG</option>
+              <option value="vless">VLESS-Reality / Xray</option>
+              <option value="shadowsocks">Shadowsocks</option>
+              <option value="openvpn">OpenVPN</option>
+              <option value="ssh">SSH Dynamic SOCKS</option>
+            </select>
+
+            <button class="btn btn-secondary" id="btn-ping-all-servers" title="Measure latency to all servers">
+              <i class="fa-solid fa-bolt"></i> Ping All
+            </button>
+            <button class="btn btn-primary" id="btn-add-profile-manual">
+              <i class="fa-solid fa-plus"></i> Add Profile
+            </button>
+          </div>
+        </div>
+
+        <div class="server-cards-grid" id="server-cards-container">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </section>
+
+      <!-- VIEW 3: 1-CLICK REMOTE VPS INSTALLER -->
+      <section class="tab-view" id="view-provisioner">
+        <div class="provisioner-layout">
+          
+          <!-- Configuration Form Card -->
+          <div class="card provisioner-form-card">
+            <div class="card-header">
+              <div class="title-wrap">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <h3>1-Click Server Auto-Installer</h3>
+              </div>
+            </div>
+
+            <p class="section-lead">
+              Enter your remote Linux server credentials. NexusVPN will connect via SSH, install dependencies, configure firewall rules, generate cryptographic keys, and import the ready-to-use profile automatically.
+            </p>
+
+            <form id="provisioner-form" class="app-form">
+              <div class="form-row grid-2">
+                <div class="form-group">
+                  <label for="prov-host"><i class="fa-solid fa-globe"></i> Server Host / Public IP</label>
+                  <input type="text" id="prov-host" placeholder="e.g. 198.51.100.50" required>
+                </div>
+                <div class="form-group">
+                  <label for="prov-port"><i class="fa-solid fa-network-wired"></i> SSH Port</label>
+                  <input type="number" id="prov-port" value="22" required>
+                </div>
+              </div>
+
+              <div class="form-row grid-2">
+                <div class="form-group">
+                  <label for="prov-user"><i class="fa-solid fa-user"></i> SSH Username</label>
+                  <input type="text" id="prov-user" value="root" required>
+                </div>
+                <div class="form-group">
+                  <label for="prov-auth-type"><i class="fa-solid fa-key"></i> Auth Method</label>
+                  <select id="prov-auth-type">
+                    <option value="password">Root Password</option>
+                    <option value="key">Private SSH Key</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" id="prov-password-group">
+                <label for="prov-password"><i class="fa-solid fa-lock"></i> Root Password</label>
+                <input type="password" id="prov-password" placeholder="Enter your VPS root password">
+              </div>
+
+              <div class="form-group" id="prov-key-group" style="display: none;">
+                <label for="prov-key"><i class="fa-solid fa-file-code"></i> Private SSH Key Content</label>
+                <textarea id="prov-key" rows="4" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label><i class="fa-solid fa-layer-group"></i> Choose Deployment Recipe</label>
+                <div class="recipe-grid">
+                  <label class="recipe-card active">
+                    <input type="radio" name="prov-recipe" value="vless" checked>
+                    <div class="recipe-content">
+                      <div class="recipe-icon"><i class="fa-solid fa-mask"></i></div>
+                      <div class="recipe-title">VLESS-Reality (Xray)</div>
+                      <p>Top DPI bypass. Disguises traffic as real HTTPS browsing to Microsoft/Apple.</p>
+                      <span class="badge-recommended">Best for Censorship Bypass</span>
+                    </div>
+                  </label>
+
+                  <label class="recipe-card">
+                    <input type="radio" name="prov-recipe" value="wireguard">
+                    <div class="recipe-content">
+                      <div class="recipe-icon"><i class="fa-solid fa-bolt"></i></div>
+                      <div class="recipe-title">WireGuard Core</div>
+                      <p>Ultra-fast kernel VPN. Maximum speeds, lowest ping, and instant connections.</p>
+                      <span class="badge-tag">Max Speed</span>
+                    </div>
+                  </label>
+
+                  <label class="recipe-card">
+                    <input type="radio" name="prov-recipe" value="3x-ui">
+                    <div class="recipe-content">
+                      <div class="recipe-icon"><i class="fa-solid fa-sliders"></i></div>
+                      <div class="recipe-title">3X-UI All-in-One Panel</div>
+                      <p>Deploys a full Web UI dashboard to manage multiple multi-protocol inbounds.</p>
+                      <span class="badge-tag">Web Control Panel</span>
+                    </div>
+                  </label>
+
+                  <label class="recipe-card">
+                    <input type="radio" name="prov-recipe" value="shadowsocks">
+                    <div class="recipe-content">
+                      <div class="recipe-icon"><i class="fa-solid fa-ghost"></i></div>
+                      <div class="recipe-title">Shadowsocks-2022</div>
+                      <p>Lightweight encrypted SOCKS5 tunnel with fast open support.</p>
+                      <span class="badge-tag">Lightweight</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="btn-test-ssh">
+                  <i class="fa-solid fa-plug"></i> Test Connection
+                </button>
+                <button type="submit" class="btn btn-primary btn-glow" id="btn-start-provisioning">
+                  <i class="fa-solid fa-rocket"></i> Deploy & Auto-Install Now
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Live Terminal Output Card -->
+          <div class="card terminal-card">
+            <div class="card-header terminal-header">
+              <div class="title-wrap">
+                <i class="fa-solid fa-terminal"></i>
+                <h3>Deployment Console</h3>
+              </div>
+              <div class="term-actions">
+                <span class="status-indicator" id="term-status-indicator">IDLE</span>
+                <button class="btn btn-icon" id="btn-clear-term" title="Clear Console"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </div>
+
+            <div class="terminal-body" id="provisioner-terminal-logs">
+              <div class="term-line info">[System] Ready for automated deployment. Enter server details and click Deploy.</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 4: DIAGNOSTICS & LEAK TEST -->
+      <section class="tab-view" id="view-diagnostics">
+        <div class="diagnostics-grid">
+          
+          <!-- IP Location Card -->
+          <div class="card ip-details-card">
+            <div class="card-header">
+              <div class="title-wrap">
+                <i class="fa-solid fa-earth-americas"></i>
+                <h3>Public IP & Geo-Location</h3>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="btn-refresh-ip-diag">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+              </button>
+            </div>
+
+            <div class="ip-info-table">
+              <div class="ip-info-row">
+                <span class="k">Public IPv4</span>
+                <span class="v code" id="diag-ip-val">Loading...</span>
+              </div>
+              <div class="ip-info-row">
+                <span class="k">Location</span>
+                <span class="v" id="diag-geo-val">Loading...</span>
+              </div>
+              <div class="ip-info-row">
+                <span class="k">ISP / Host Organization</span>
+                <span class="v" id="diag-isp-val">Loading...</span>
+              </div>
+              <div class="ip-info-row">
+                <span class="k">Timezone</span>
+                <span class="v" id="diag-tz-val">Loading...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DNS Leak Inspector Card -->
+          <div class="card dns-leak-card">
+            <div class="card-header">
+              <div class="title-wrap">
+                <i class="fa-solid fa-shield-virus"></i>
+                <h3>DNS Leak Detection</h3>
+              </div>
+              <button class="btn btn-primary btn-sm" id="btn-run-dns-test">
+                <i class="fa-solid fa-play"></i> Run Leak Test
+              </button>
+            </div>
+
+            <div class="dns-test-status" id="dns-test-summary">
+              <div class="status-shield secure">
+                <i class="fa-solid fa-circle-check text-emerald"></i>
+                <div class="shield-text">
+                  <h4>DNS Security: Fully Protected</h4>
+                  <p>DNS queries are handled via encrypted upstream resolvers (DoH/DoT). No ISP leak detected.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="dns-servers-list" id="dns-detected-servers">
+              <!-- Populated by diagnostics.js -->
+            </div>
+          </div>
+
+          <!-- Custom Ping & Latency Benchmark -->
+          <div class="card ping-tool-card">
+            <div class="card-header">
+              <div class="title-wrap">
+                <i class="fa-solid fa-gauge-high"></i>
+                <h3>Live Target Benchmark</h3>
+              </div>
+            </div>
+
+            <div class="ping-input-row">
+              <input type="text" id="custom-ping-host" placeholder="Enter hostname or IP (e.g. 1.1.1.1 or google.com)" value="1.1.1.1">
+              <button class="btn btn-secondary" id="btn-run-custom-ping">Test Ping</button>
+            </div>
+
+            <div class="ping-results-box" id="custom-ping-result">
+              <span>Enter a host and press Test Ping to measure round-trip time (RTT).</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 5: SMART BYPASS RULES -->
+      <section class="tab-view" id="view-routing">
+        <div class="card rules-card">
+          <div class="card-header">
+            <div class="title-wrap">
+              <i class="fa-solid fa-route"></i>
+              <h3>Smart Split-Tunneling & Bypass Rules</h3>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-save-rules">
+              <i class="fa-solid fa-floppy-disk"></i> Save Rules
+            </button>
+          </div>
+
+          <p class="section-lead">
+            Configure which domains, apps, or IP ranges should bypass the VPN (direct local routing) versus those that must always be forced through the encrypted tunnel.
+          </p>
+
+          <div class="rules-grid">
+            <div class="rule-column">
+              <div class="rule-col-header">
+                <h4><i class="fa-solid fa-arrow-turn-down-right"></i> Direct Bypass List (Local Internet)</h4>
+                <p>Traffic matching these domains will connect directly without VPN.</p>
+              </div>
+              <textarea id="rules-bypass-domains" rows="10" placeholder="localhost&#10;*.lan&#10;192.168.*&#10;*.bank.com"></textarea>
+            </div>
+
+            <div class="rule-column">
+              <div class="rule-col-header">
+                <h4><i class="fa-solid fa-lock text-accent"></i> Forced VPN List (Encrypted Tunnel)</h4>
+                <p>Traffic matching these domains will always route via VPN.</p>
+              </div>
+              <textarea id="rules-force-domains" rows="10" placeholder="*.google.com&#10;*.youtube.com&#10;*.x.com&#10;*.netflix.com"></textarea>
+            </div>
+          </div>
+
+          <div class="toggle-options">
+            <label class="toggle-control">
+              <input type="checkbox" id="toggle-bypass-lan" checked>
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Bypass Local Area Network (LAN & Printers)</span>
+            </label>
+
+            <label class="toggle-control">
+              <input type="checkbox" id="toggle-bypass-domestic" checked>
+              <span class="toggle-slider"></span>
+              <span class="toggle-label">Bypass Domestic/Local Country IP Geolocation</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: SETTINGS -->
+      <section class="tab-view" id="view-settings">
+        <div class="card settings-card">
+          <div class="card-header">
+            <div class="title-wrap">
+              <i class="fa-solid fa-sliders"></i>
+              <h3>Application & Protocol Settings</h3>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-save-settings">
+              <i class="fa-solid fa-floppy-disk"></i> Save Settings
+            </button>
+          </div>
+
+          <div class="settings-form">
+            <div class="settings-section">
+              <h4>Security & Protection</h4>
+              <div class="settings-row">
+                <div class="setting-desc">
+                  <strong>Permanent Kill Switch</strong>
+                  <span>Automatically block network traffic if VPN unexpectedly disconnects.</span>
+                </div>
+                <label class="toggle-control">
+                  <input type="checkbox" id="setting-killswitch" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="settings-row">
+                <div class="setting-desc">
+                  <strong>DNS-over-HTTPS (DoH) Encryption</strong>
+                  <span>Encrypt all domain resolution requests using HTTPS.</span>
+                </div>
+                <label class="toggle-control">
+                  <input type="checkbox" id="setting-doh" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="settings-row">
+                <div class="setting-desc">
+                  <strong>Secure DNS Provider</strong>
+                  <span>Select preferred upstream DNS server.</span>
+                </div>
+                <select id="setting-dns-provider">
+                  <option value="cloudflare">Cloudflare (1.1.1.1) - Maximum Speed & Privacy</option>
+                  <option value="quad9">Quad9 (9.9.9.9) - Malware & Phishing Blocked</option>
+                  <option value="google">Google DNS (8.8.8.8)</option>
+                  <option value="custom">Custom DNS Server</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h4>Local Proxy Bridge</h4>
+              <div class="settings-row">
+                <div class="setting-desc">
+                  <strong>Local SOCKS5 Port</strong>
+                  <span>Port for browser and application proxying.</span>
+                </div>
+                <input type="number" id="setting-socks-port" value="10808" class="input-sm">
+              </div>
+
+              <div class="settings-row">
+                <div class="setting-desc">
+                  <strong>Local HTTP Proxy Port</strong>
+                  <span>HTTP/HTTPS forwarder port.</span>
+                </div>
+                <input type="number" id="setting-http-port" value="10809" class="input-sm">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: Universal Import -->
+  <div class="modal-overlay" id="modal-import">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="title-wrap">
+          <i class="fa-solid fa-file-import"></i>
+          <h3>Import VPN / Proxy Profile</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-import-modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p>Paste a subscription URL (`vless://`, `ss://`, `trojan://`, `vmess://`) or paste the contents of a WireGuard (`wg0.conf`) or OpenVPN (`.ovpn`) file.</p>
+
+        <div class="form-group">
+          <label for="import-custom-name">Profile Nickname (Optional)</label>
+          <input type="text" id="import-custom-name" placeholder="e.g. My Private US Node">
+        </div>
+
+        <div class="form-group">
+          <label for="import-content">Configuration Content or URI</label>
+          <textarea id="import-content" rows="6" placeholder="vless://... or [Interface]..."></textarea>
+        </div>
+
+        <div class="file-dropzone" id="import-dropzone">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Or click to upload a <strong>.conf</strong>, <strong>.ovpn</strong>, or <strong>.json</strong> file</span>
+          <input type="file" id="import-file-input" accept=".conf,.ovpn,.json,.txt" style="display: none;">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-import">Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-import">Import & Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: QR Code & Mobile Sync -->
+  <div class="modal-overlay" id="modal-qr">
+    <div class="modal-card modal-sm text-center">
+      <div class="modal-header">
+        <h3 id="qr-modal-title">Mobile Quick Sync</h3>
+        <button class="btn-close-modal" id="btn-close-qr-modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p>Scan this QR code with your mobile VPN client (Amnezia, WireGuard, v2rayNG, Shadowrocket, Sing-box) to import instantly.</p>
+        
+        <div class="qr-display-wrap">
+          <img id="qr-image" src="" alt="VPN QR Code">
+        </div>
+
+        <div class="uri-copy-box">
+          <input type="text" id="qr-uri-text" readonly>
+          <button class="btn btn-secondary btn-sm" id="btn-copy-uri" title="Copy to clipboard">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-center">
+        <button class="btn btn-primary" id="btn-done-qr">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Manual Add/Edit Profile -->
+  <div class="modal-overlay" id="modal-profile-edit">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="profile-edit-modal-title">Add VPN Profile</h3>
+        <button class="btn-close-modal" id="btn-close-edit-modal">&times;</button>
+      </div>
+
+      <form id="profile-edit-form">
+        <div class="modal-body">
+          <div class="form-row grid-2">
+            <div class="form-group">
+              <label for="edit-profile-name">Profile Name</label>
+              <input type="text" id="edit-profile-name" required placeholder="e.g. Frankfurt Fast Node">
+            </div>
+            <div class="form-group">
+              <label for="edit-profile-proto">Protocol</label>
+              <select id="edit-profile-proto">
+                <option value="wireguard">WireGuard / AmneziaWG</option>
+                <option value="vless">VLESS-Reality (DPI Bypass)</option>
+                <option value="shadowsocks">Shadowsocks-2022</option>
+                <option value="openvpn">OpenVPN</option>
+                <option value="ssh">SSH Dynamic SOCKS5</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row grid-2">
+            <div class="form-group">
+              <label for="edit-profile-server">Server IP / Host</label>
+              <input type="text" id="edit-profile-server" required placeholder="198.51.100.1">
+            </div>
+            <div class="form-group">
+              <label for="edit-profile-port">Port</label>
+              <input type="number" id="edit-profile-port" required value="443">
+            </div>
+          </div>
+
+          <div class="form-row grid-2">
+            <div class="form-group">
+              <label for="edit-profile-country">Country Code (2 letters)</label>
+              <input type="text" id="edit-profile-country" maxlength="2" placeholder="DE" value="US">
+            </div>
+            <div class="form-group">
+              <label for="edit-profile-city">City Name</label>
+              <input type="text" id="edit-profile-city" placeholder="Frankfurt" value="New York">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-edit-profile">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/diagnostics.js"></script>
+  <script src="js/provisioner.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
