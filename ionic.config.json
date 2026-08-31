@@ -1,0 +1,8 @@
+{
+  "name": "nexus-vpn-manager",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom",
+  "id": "378234e9"
+}
