@@ -96,7 +96,7 @@ const ProvisionerManager = {
     this.logToTerminal(`Testing SSH connection to ${data.username}@${data.host}:${data.port}...`, 'info');
 
     try {
-      const res = await fetch('/api/provision/test-ssh', {
+      const res = await fetch(`${typeof getApiBaseUrl === 'function' ? getApiBaseUrl() : ''}/api/provision/test-ssh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -140,7 +140,7 @@ const ProvisionerManager = {
     this.logToTerminal(`Starting 1-click remote deployment of [${data.protocol.toUpperCase()}] on ${data.host}...`, 'info');
 
     try {
-      const res = await fetch('/api/provision/install', {
+      const res = await fetch(`${typeof getApiBaseUrl === 'function' ? getApiBaseUrl() : ''}/api/provision/install`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, sessionToken: this.currentSessionToken })

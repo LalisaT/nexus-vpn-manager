@@ -13,8 +13,11 @@
 <body class="theme-dark">
   <div class="app-container">
     
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
+    <!-- Mobile Slide-over Backdrop -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Sidebar Navigation Drawer -->
+    <aside class="sidebar" id="app-sidebar">
       <div class="brand">
         <div class="brand-icon">
           <i class="fa-solid fa-shield-halved"></i>
@@ -23,6 +26,9 @@
           <h2>Nexus<span>VPN</span></h2>
           <p class="tagline">All-in-One Bypass Suite</p>
         </div>
+        <button class="btn-close-drawer" id="btn-close-drawer" aria-label="Close menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
       <nav class="nav-menu">
@@ -72,8 +78,14 @@
       <!-- Top App Header -->
       <header class="top-header">
         <div class="header-left">
-          <h1 id="page-title">Dashboard</h1>
-          <p id="page-subtitle">Real-time connection control & multi-protocol status</p>
+          <!-- Mobile Menu Drawer Button -->
+          <button class="btn-menu-drawer" id="btn-toggle-drawer" aria-label="Toggle navigation drawer" aria-expanded="false">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="header-titles">
+            <h1 id="page-title">Dashboard</h1>
+            <p id="page-subtitle">Real-time connection control & multi-protocol status</p>
+          </div>
         </div>
 
         <div class="header-right">
@@ -93,7 +105,7 @@
           <!-- Quick Import Action -->
           <button class="btn btn-primary btn-sm" id="btn-quick-import-open">
             <i class="fa-solid fa-file-import"></i>
-            <span>Import Profile</span>
+            <span>Import</span>
           </button>
         </div>
       </header>
@@ -579,6 +591,17 @@
                   <option value="google">Google DNS (8.8.8.8)</option>
                   <option value="custom">Custom DNS Server</option>
                 </select>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h4>Mobile & Remote Connection</h4>
+              <div class="settings-row">
+                <div class="setting-desc">
+                  <strong>Remote Backend Server URL</strong>
+                  <span>When using the mobile APK or remote browser, specify your server (e.g. <code>http://192.168.1.50:3030</code>). Leave blank for auto-detected host.</span>
+                </div>
+                <input type="text" id="setting-remote-server-url" placeholder="http://localhost:3030" class="input-md">
               </div>
             </div>
 
