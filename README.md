@@ -79,7 +79,8 @@ npm test
 
 ---
 
-## 📄 License & Disclaimer
+## 📄 License & Policies
 
-This project is open-source under the [MIT License](LICENSE).  
-*Designed for educational, diagnostic, and personal network optimization purposes.*
+- **License:** Open-source under the [MIT License](LICENSE).
+- **Acceptable Use & Takedown Policy:** Please read [POLICY.md](POLICY.md) for intended use, prohibited activities, and compliance/takedown procedures.
+- **Disclaimer:** *Designed strictly for educational, diagnostic, and personal network optimization purposes.*
