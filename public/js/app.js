@@ -154,6 +154,10 @@ const App = {
   mockTelemetryTimer: null,
   bytesIn: 0,
   bytesOut: 0,
+  dataCapMb: 1000,
+  dataSaverEnabled: true,
+  warned80: false,
+  warned100: false,
 
   async init() {
     this.initWebSocket();
@@ -163,6 +167,7 @@ const App = {
     this.bindModals();
     this.bindSettings();
     this.bindRules();
+    this.initDataSaver();
     await this.loadProfiles();
   },
 
@@ -508,6 +513,82 @@ const App = {
     if (inElem) inElem.textContent = `${((data.bytesIn || 0) / (1024 * 1024)).toFixed(2)} MB`;
     if (outElem) outElem.textContent = `${((data.bytesOut || 0) / (1024 * 1024)).toFixed(2)} MB`;
     if (vipElem) vipElem.textContent = data.virtualIp || '---.---.---.---';
+
+    this.bytesIn = data.bytesIn || this.bytesIn;
+    this.bytesOut = data.bytesOut || this.bytesOut;
+    this.updateQuotaDisplay(this.bytesIn + this.bytesOut);
+  },
+
+  initDataSaver() {
+    const savedCap = localStorage.getItem('nexus_data_cap');
+    if (savedCap !== null) {
+      this.dataCapMb = parseInt(savedCap, 10);
+    }
+    const select = document.getElementById('quota-limit-select');
+    if (select) {
+      select.value = String(this.dataCapMb);
+      select.addEventListener('change', (e) => {
+        this.dataCapMb = parseInt(e.target.value, 10);
+        localStorage.setItem('nexus_data_cap', String(this.dataCapMb));
+        this.warned80 = false;
+        this.warned100 = false;
+        this.updateQuotaDisplay(this.bytesIn + this.bytesOut);
+        showToast(`Data allowance cap updated: ${this.dataCapMb === 0 ? 'Unlimited' : (this.dataCapMb >= 1000 ? (this.dataCapMb / 1000) + ' GB' : this.dataCapMb + ' MB')}`, 'info');
+      });
+    }
+
+    const saverToggle = document.getElementById('toggle-data-saver');
+    if (saverToggle) {
+      const savedSaver = localStorage.getItem('nexus_data_saver');
+      this.dataSaverEnabled = savedSaver === null ? true : savedSaver === 'true';
+      saverToggle.checked = this.dataSaverEnabled;
+      saverToggle.addEventListener('change', (e) => {
+        this.dataSaverEnabled = e.target.checked;
+        localStorage.setItem('nexus_data_saver', String(this.dataSaverEnabled));
+        showToast(`Data Saver mode ${this.dataSaverEnabled ? 'enabled (ad/tracker blocking active)' : 'disabled'}.`, 'info');
+      });
+    }
+
+    this.updateQuotaDisplay(0);
+  },
+
+  updateQuotaDisplay(totalBytes) {
+    const totalMb = totalBytes / (1024 * 1024);
+    const usageText = document.getElementById('quota-usage-text');
+    const limitDisplay = document.getElementById('quota-limit-display');
+    const fill = document.getElementById('quota-progress-fill');
+
+    if (!usageText || !limitDisplay || !fill) return;
+
+    if (this.dataCapMb <= 0) {
+      limitDisplay.textContent = 'Unlimited';
+      usageText.innerHTML = `${totalMb.toFixed(1)} MB / <strong>Unlimited</strong>`;
+      fill.style.width = '100%';
+      fill.className = 'quota-fill';
+      return;
+    }
+
+    const limitStr = this.dataCapMb >= 1000 ? `${(this.dataCapMb / 1000).toFixed(1)} GB` : `${this.dataCapMb} MB`;
+    limitDisplay.textContent = limitStr;
+    usageText.innerHTML = `${totalMb.toFixed(1)} MB / <strong>${limitStr}</strong>`;
+
+    const pct = Math.min(100, Math.round((totalMb / this.dataCapMb) * 100));
+    fill.style.width = `${pct}%`;
+
+    fill.className = 'quota-fill';
+    if (pct >= 90) {
+      fill.classList.add('danger');
+      if (!this.warned100 && pct >= 100) {
+        this.warned100 = true;
+        showToast(`⚠️ Data Cap Reached! 100% of your ${limitStr} allowance has been consumed.`, 'error');
+      }
+    } else if (pct >= 75) {
+      fill.classList.add('warning');
+      if (!this.warned80) {
+        this.warned80 = true;
+        showToast(`Notice: 80% of your ${limitStr} mobile data quota has been used.`, 'info');
+      }
+    }
   },
 
   // Load and Render Server Profiles
@@ -916,6 +997,41 @@ const App = {
         if (force) force.value = (data.rules.forceVpnDomains || []).join('\n');
       }
     }).catch(() => {});
+
+    // Preset: Bypass Telegram (keeps official Telegram on native cellular connection)
+    document.getElementById('preset-bypass-telegram')?.addEventListener('click', () => {
+      const bypass = document.getElementById('rules-bypass-domains');
+      if (!bypass) return;
+      const tgDomains = ['telegram.org', '*.telegram.org', 't.me', '*.t.me', 'web.telegram.org', 'telesco.pe'];
+      const current = bypass.value.split('\n').map(s => s.trim()).filter(Boolean);
+      tgDomains.forEach(d => {
+        if (!current.includes(d)) current.push(d);
+      });
+      bypass.value = current.join('\n');
+      showToast('Telegram domains added to Direct Bypass! (Uses direct cellular)', 'success');
+    });
+
+    // Preset: Bypass WhatsApp & Social
+    document.getElementById('preset-bypass-social')?.addEventListener('click', () => {
+      const bypass = document.getElementById('rules-bypass-domains');
+      if (!bypass) return;
+      const socialDomains = ['*.whatsapp.net', '*.whatsapp.com', '*.facebook.com', '*.instagram.com', '*.fbcdn.net', '*.cdninstagram.com'];
+      const current = bypass.value.split('\n').map(s => s.trim()).filter(Boolean);
+      socialDomains.forEach(d => {
+        if (!current.includes(d)) current.push(d);
+      });
+      bypass.value = current.join('\n');
+      showToast('WhatsApp & Social added to Direct Bypass! (Uses direct cellular)', 'success');
+    });
+
+    // Preset: Reset Defaults
+    document.getElementById('preset-reset-routing')?.addEventListener('click', () => {
+      const bypass = document.getElementById('rules-bypass-domains');
+      const force = document.getElementById('rules-force-domains');
+      if (bypass) bypass.value = 'localhost\n*.lan\n192.168.*\n10.*\n172.16.*';
+      if (force) force.value = '*.google.com\n*.youtube.com\n*.x.com\n*.netflix.com';
+      showToast('Routing rules reset to default.', 'info');
+    });
 
     document.getElementById('btn-save-rules')?.addEventListener('click', async () => {
       const bypass = document.getElementById('rules-bypass-domains')?.value.split('\n').map(s => s.trim()).filter(Boolean);

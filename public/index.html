@@ -241,6 +241,44 @@
             </div>
           </div>
 
+          <!-- Mobile Data Allowance & Saver Card -->
+          <div class="card data-saver-card">
+            <div class="card-header">
+              <div class="title-wrap">
+                <i class="fa-solid fa-gauge-simple-high"></i>
+                <h3>Data Allowance & Saver</h3>
+              </div>
+              <span class="status-indicator active" id="data-saver-status">MONITORING</span>
+            </div>
+
+            <div class="data-quota-content">
+              <div class="quota-meta">
+                <span>Session Traffic</span>
+                <span class="quota-numbers" id="quota-usage-text">0.0 MB / <strong id="quota-limit-display">1.0 GB</strong></span>
+              </div>
+              <div class="quota-progress-bar">
+                <div class="quota-fill" id="quota-progress-fill" style="width: 0%;"></div>
+              </div>
+              <div class="quota-controls">
+                <div class="quota-setting-item">
+                  <label for="quota-limit-select"><i class="fa-solid fa-sim-card"></i> Data Cap:</label>
+                  <select id="quota-limit-select">
+                    <option value="500">500 MB</option>
+                    <option value="1000" selected>1.0 GB</option>
+                    <option value="2000">2.0 GB</option>
+                    <option value="5000">5.0 GB</option>
+                    <option value="0">Unlimited</option>
+                  </select>
+                </div>
+                <label class="toggle-control">
+                  <input type="checkbox" id="toggle-data-saver" checked>
+                  <span class="toggle-slider"></span>
+                  <span class="toggle-label">Data Saver (Block Ad/Telemetry Trackers)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -507,6 +545,20 @@
           <p class="section-lead">
             Configure which domains, apps, or IP ranges should bypass the VPN (direct local routing) versus those that must always be forced through the encrypted tunnel.
           </p>
+
+          <!-- One-Tap Carrier Bundle Presets -->
+          <div class="preset-bundle-bar">
+            <span class="preset-label"><i class="fa-solid fa-wand-magic-sparkles text-accent"></i> Quick Routing Presets:</span>
+            <button type="button" class="btn btn-secondary btn-sm" id="preset-bypass-telegram" title="Keep Telegram on carrier native bundle without routing through VPN">
+              <i class="fa-brands fa-telegram text-accent"></i> Bypass Telegram (Use Direct Cellular)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="preset-bypass-social" title="Keep WhatsApp, Facebook, Instagram on carrier bundle">
+              <i class="fa-brands fa-whatsapp text-emerald"></i> Bypass WhatsApp & Social
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="preset-reset-routing">
+              <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+            </button>
+          </div>
 
           <div class="rules-grid">
             <div class="rule-column">
